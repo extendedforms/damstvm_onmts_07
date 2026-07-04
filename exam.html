@@ -4,307 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NEET PG CBT - Exam</title>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #ffffff;
-      color: #111;
-    }
-    .topbar {
-      background: #003b66;
-      color: white;
-      height: 34px;
-      padding: 7px 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 14px;
-      font-weight: bold;
-      position: sticky;
-      top: 0;
-      z-index: 999;
-    }
-    .layout {
-      display: grid;
-      grid-template-columns: 1fr 310px;
-      min-height: calc(100vh - 34px);
-    }
-    .main {
-      padding: 15px 45px;
-      background: #ffffff;
-    }
-    .qbox {
-      max-width: 950px;
-    }
-    .student-info {
-      font-size: 13px;
-      margin-bottom: 10px;
-      line-height: 1.5;
-      color: #333;
-    }
-    .qtitle {
-      font-weight: bold;
-      margin-bottom: 12px;
-      font-size: 15px;
-    }
-    .qtext {
-      background: #f7f7f7;
-      padding: 12px;
-      border-radius: 4px;
-      line-height: 1.45;
-      font-size: 15px;
-      margin-bottom: 14px;
-      white-space: pre-wrap;
-    }
-    .qimg {
-      width: 100%;
-      max-height: 520px;
-      object-fit: contain;
-      display: block;
-      margin: 12px auto;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      cursor: zoom-in;
-    }
-    .opts {
-      margin-top: 10px;
-    }
-    .opt {
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      padding: 10px 12px;
-      margin-bottom: 8px;
-      font-size: 14px;
-      background: white;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .opt:hover {
-      background: #f6f8fb;
-    }
-    .opt.selected {
-      background: #dbeafe;
-      border-color: #003b66;
-      font-weight: bold;
-    }
-    .radio-circle {
-      width: 13px;
-      height: 13px;
-      min-width: 13px;
-      border-radius: 50%;
-      border: 2px solid #8a8a8a;
-      display: inline-block;
-      position: relative;
-    }
-    .opt.selected .radio-circle {
-      border-color: #0057d9;
-    }
-    .opt.selected .radio-circle::after {
-      content: "";
-      width: 7px;
-      height: 7px;
-      background: #0057d9;
-      border-radius: 50%;
-      position: absolute;
-      left: 1px;
-      top: 1px;
-    }
-    .actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 12px;
-      flex-wrap: wrap;
-    }
-    button {
-      background: #003b66;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 9px 14px;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 13px;
-    }
-    button:hover {
-      opacity: 0.9;
-    }
-    button:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-    }
-    button.danger {
-      background: #c40035;
-    }
-    .palette {
-      background: #f3f5fa;
-      border-left: 1px solid #d6dce5;
-      padding: 25px 18px;
-      min-height: calc(100vh - 34px);
-    }
-    .palette h3 {
-      margin: 0 0 16px 0;
-      font-size: 20px;
-    }
-    #pal {
-      display: grid;
-      grid-template-columns: repeat(6, 38px);
-      gap: 10px;
-      align-items: center;
-    }
-    #pal button {
-      width: 38px;
-      height: 38px;
-      padding: 0;
-      border-radius: 6px;
-      border: none;
-      font-size: 13px;
-      font-weight: bold;
-      color: #111;
-      background: #dbe3e7;
-    }
-    #pal button.current {
-      outline: 3px solid #000;
-      outline-offset: 2px;
-    }
-    #pal button.unanswered {
-      background: #dbe3e7;
-      color: #111;
-    }
-    #pal button.answered {
-      background: #2e7d32;
-      color: white;
-    }
-    #pal button.review {
-      background: #7b1fa2;
-      color: white;
-    }
-    #pal button.ansreview {
-      background: #0d70b7;
-      color: white;
-    }
-    .legend {
-      margin-top: 16px;
-      font-size: 13px;
-    }
-    .legend div {
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .dot {
-      width: 13px;
-      height: 13px;
-      display: inline-block;
-      border-radius: 3px;
-    }
-    .dot.unanswered {
-      background: #dbe3e7;
-    }
-    .dot.answered {
-      background: #2e7d32;
-    }
-    .dot.review {
-      background: #7b1fa2;
-    }
-    .dot.ansreview {
-      background: #0d70b7;
-    }
-    .warning {
-      color: #c62828;
-      font-weight: bold;
-      margin-top: 14px;
-      font-size: 14px;
-    }
-    .img-modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.92);
-      z-index: 9999;
-    }
-    .img-modal.show {
-      display: block;
-    }
-    .img-modal-top {
-      height: 55px;
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      gap: 10px;
-      padding: 10px;
-    }
-    .img-modal-body {
-      height: calc(100vh - 55px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: auto;
-    }
-    .img-modal-body img {
-      max-width: 95%;
-      max-height: 95%;
-      object-fit: contain;
-    }
-    @media (max-width: 768px) {
-      .topbar {
-        height: auto;
-        min-height: 36px;
-        font-size: 13px;
-        padding: 8px 10px;
-      }
-      .layout {
-        display: block;
-      }
-      .main {
-        padding: 12px;
-      }
-      .qtext {
-        font-size: 14px;
-      }
-      .qimg {
-        max-height: 360px;
-      }
-      .opt {
-        font-size: 14px;
-        padding: 10px;
-      }
-      .actions {
-        gap: 6px;
-      }
-      .actions button {
-        padding: 8px 10px;
-        font-size: 12px;
-      }
-      .palette {
-        border-left: none;
-        border-top: 1px solid #d6dce5;
-        min-height: auto;
-        padding: 18px 12px;
-      }
-      #pal {
-        grid-template-columns: repeat(6, 42px);
-        gap: 9px;
-      }
-      #pal button {
-        width: 42px;
-        height: 42px;
-        font-size: 13px;
-      }
-    }
-    @media (max-width: 380px) {
-      #pal {
-        grid-template-columns: repeat(5, 42px);
-      }
-    }
-  </style>
+
+  <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
   <header class="topbar">
     <div>NEET PG CBT</div>
@@ -314,29 +17,39 @@
       Violations: <b id="vio">0</b>
     </div>
   </header>
+
   <div class="layout">
     <main class="main">
       <div class="qbox">
         <div class="student-info" id="studentInfo"></div>
+
         <div id="qTitle" class="qtitle"></div>
         <div id="qText" class="qtext"></div>
+
         <img id="qImg" class="qimg" style="display:none;" alt="Question image" />
+
         <div id="opts" class="opts"></div>
+
         <div class="actions">
           <button id="prevBtn" onclick="prevQuestion()">Previous</button>
           <button onclick="clearResponse()">Clear Response</button>
           <button id="markBtn" onclick="markForReview()">Mark for Review</button>
           <button onclick="nextQuestion()">Next</button>
         </div>
+
         <div class="actions">
           <button class="danger" onclick="confirmSubmit()">Submit</button>
         </div>
+
         <div class="warning" id="warning"></div>
       </div>
     </main>
+
     <aside class="palette">
       <h3>Questions</h3>
+
       <div id="pal"></div>
+
       <div class="legend">
         <div><span class="dot unanswered"></span> Unanswered</div>
         <div><span class="dot answered"></span> Answered</div>
@@ -345,25 +58,32 @@
       </div>
     </aside>
   </div>
+
   <div id="imgModal" class="img-modal">
     <div class="img-modal-top">
       <button onclick="openImageFullscreen()">⛶ Fullscreen</button>
       <button class="danger" onclick="closeImageModal()">✕ Close</button>
     </div>
+
     <div class="img-modal-body">
       <img id="imgModalPic" alt="Question image enlarged" />
     </div>
   </div>
+
   <script src="config.js"></script>
   <script src="questions.js"></script>
+
   <script>
     const API_URL = window.API_URL || window.SCRIPT_URL || "";
+
     const EXAM_DURATION_SECONDS = Number(
       window.EXAM_DURATION_SECONDS ||
       (window.EXAM_DURATION_MIN ? window.EXAM_DURATION_MIN * 60 : 180 * 60)
     );
+
     const MARKS_CORRECT = Number(window.MARKS_CORRECT ?? 4);
     const MARKS_WRONG = Number(window.MARKS_WRONG ?? -1);
+
     let currentIndex = 0;
     let userAnswers = {};
     let markedQuestions = {};
@@ -371,6 +91,7 @@
     let submitted = false;
     let violationCount = 0;
     let timerInterval = null;
+
     function safeParse(value) {
       try {
         return JSON.parse(value);
@@ -378,6 +99,7 @@
         return null;
       }
     }
+
     function escapeHtml(text) {
       return String(text || "")
         .replaceAll("&", "&amp;")
@@ -386,6 +108,7 @@
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
     }
+
     const candidate =
       safeParse(localStorage.getItem("neet_candidate") || "") ||
       {
@@ -395,61 +118,78 @@
         phone: localStorage.getItem("candidatePhone") || "",
         email: localStorage.getItem("candidateEmail") || ""
       };
+
     if (!candidate || !candidate.token || !candidate.candidateId) {
       alert("Please login first");
       window.location.replace("login.html");
       throw new Error("Login required");
     }
+
     if (localStorage.getItem("neet_submitted") === "yes") {
       window.location.replace("result.html");
       throw new Error("Already submitted");
     }
+
     if (!API_URL) {
       alert("API_URL missing. Please check config.js");
       throw new Error("API_URL missing");
     }
+
     if (!window.questions || !Array.isArray(window.questions) || window.questions.length === 0) {
       alert("Questions not loaded. Please check questions.js");
       throw new Error("Questions not loaded");
     }
+
     const candidateId = candidate.candidateId;
     const token = candidate.token;
     const candidateName = candidate.name || "";
     const candidatePhone = candidate.phone || "";
     const candidateEmail = candidate.email || "";
+
     const stateKey = "neet_exam_state_" + candidateId;
     const questionOrderKey = "neet_question_order_" + candidateId;
+
     document.getElementById("studentInfo").innerHTML =
       "<b>Name:</b> " + escapeHtml(candidateName) +
       " | <b>ID:</b> " + escapeHtml(candidateId) +
       " | <b>Email:</b> " + escapeHtml(candidateEmail);
+
     function shuffleArray(array) {
       const copy = [...array];
+
       for (let i = copy.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [copy[i], copy[j]] = [copy[j], copy[i]];
       }
+
       return copy;
     }
+
     function applyStableQuestionOrder() {
       const allQuestions = [...window.questions];
       const savedOrder = safeParse(localStorage.getItem(questionOrderKey) || "");
+
       if (Array.isArray(savedOrder) && savedOrder.length === allQuestions.length) {
         const questionMap = {};
+
         allQuestions.forEach(function(q) {
           questionMap[String(q.id)] = q;
         });
+
         const orderedQuestions = savedOrder
           .map(function(id) {
             return questionMap[String(id)];
           })
           .filter(Boolean);
+
         if (orderedQuestions.length === allQuestions.length) {
           window.questions = orderedQuestions;
           return;
         }
       }
+
       window.questions = shuffleArray(allQuestions);
+
       localStorage.setItem(
         questionOrderKey,
         JSON.stringify(window.questions.map(function(q) {
@@ -457,6 +197,7 @@
         }))
       );
     }
+
     function saveState() {
       localStorage.setItem(stateKey, JSON.stringify({
         currentIndex: currentIndex,
@@ -466,29 +207,38 @@
         violationCount: violationCount
       }));
     }
+
     function loadState() {
       const saved = safeParse(localStorage.getItem(stateKey) || "");
       if (!saved) return;
+
       if (typeof saved.currentIndex === "number") {
         currentIndex = saved.currentIndex;
       }
+
       if (saved.userAnswers && typeof saved.userAnswers === "object") {
         userAnswers = saved.userAnswers;
       }
+
       if (saved.markedQuestions && typeof saved.markedQuestions === "object") {
         markedQuestions = saved.markedQuestions;
       }
+
       if (saved.startedAt) {
         const savedStartedAt = new Date(saved.startedAt);
+
         if (!isNaN(savedStartedAt.getTime())) {
           startedAt = savedStartedAt;
         }
       }
+
       if (typeof saved.violationCount === "number") {
         violationCount = saved.violationCount;
       }
+
       document.getElementById("vio").textContent = violationCount;
     }
+
     function isAnswered(q) {
       return (
         userAnswers[q.id] !== undefined &&
@@ -496,21 +246,27 @@
         userAnswers[q.id] !== ""
       );
     }
+
     function buildAnswerKeyFromQuestions() {
       const answerKey = {};
+
       window.questions.forEach(function(q) {
         if (q && q.id !== undefined && q.answerIndex !== undefined) {
           answerKey[String(q.id)] = Number(q.answerIndex);
         }
       });
+
       return answerKey;
     }
+
     function calculateLocalResult() {
       let correct = 0;
       let wrong = 0;
       let unattempted = 0;
+
       window.questions.forEach(function(q) {
         const ans = userAnswers[q.id];
+
         if (ans === undefined || ans === null || ans === "") {
           unattempted++;
         } else if (Number(ans) === Number(q.answerIndex)) {
@@ -519,8 +275,10 @@
           wrong++;
         }
       });
+
       const totalQuestions = window.questions.length;
       const score = (correct * MARKS_CORRECT) + (wrong * MARKS_WRONG);
+
       return {
         score: score,
         correct: correct,
@@ -531,17 +289,23 @@
         violationCount: violationCount
       };
     }
+
     function setExamButtonsDisabled(disabled) {
       document.querySelectorAll("button").forEach(function(btn) {
         btn.disabled = disabled;
       });
     }
+
     function renderQuestion() {
       const q = window.questions[currentIndex];
+
       document.getElementById("qTitle").textContent =
         "Question " + (currentIndex + 1) + " of " + window.questions.length;
+
       document.getElementById("qText").textContent = q.question || "";
+
       const img = document.getElementById("qImg");
+
       if (q.image && String(q.image).trim() !== "") {
         img.src = q.image;
         img.style.display = "block";
@@ -549,52 +313,72 @@
         img.style.display = "none";
         img.removeAttribute("src");
       }
+
       const opts = document.getElementById("opts");
       opts.innerHTML = "";
+
       (q.options || []).forEach(function(option, index) {
         const div = document.createElement("div");
         div.className = "opt";
+
         if (Number(userAnswers[q.id]) === index) {
           div.classList.add("selected");
         }
+
         const radio = document.createElement("span");
         radio.className = "radio-circle";
+
         const text = document.createElement("span");
         text.textContent = option;
+
         div.appendChild(radio);
         div.appendChild(text);
+
         div.onclick = function() {
           if (submitted) return;
+
           userAnswers[q.id] = index;
+
           delete markedQuestions[q.id];
+
           saveState();
           renderQuestion();
         };
+
         opts.appendChild(div);
       });
+
       document.getElementById("prevBtn").disabled = currentIndex === 0;
+
       updateMarkButton();
       renderPalette();
       saveState();
     }
+
     function updateMarkButton() {
       const q = window.questions[currentIndex];
       const markBtn = document.getElementById("markBtn");
+
       if (!markBtn) return;
+
       if (markedQuestions[q.id] === true) {
         markBtn.textContent = "Remove Mark";
       } else {
         markBtn.textContent = "Mark for Review";
       }
     }
+
     function renderPalette() {
       const pal = document.getElementById("pal");
       pal.innerHTML = "";
+
       window.questions.forEach(function(q, index) {
         const btn = document.createElement("button");
         btn.textContent = index + 1;
+
         const answered = isAnswered(q);
         const marked = markedQuestions[q.id] === true;
+
         if (answered && marked) {
           btn.className = "ansreview";
         } else if (answered) {
@@ -604,55 +388,74 @@
         } else {
           btn.className = "unanswered";
         }
+
         if (index === currentIndex) {
           btn.classList.add("current");
         }
+
         btn.onclick = function() {
           if (submitted) return;
+
           currentIndex = index;
           renderQuestion();
         };
+
         pal.appendChild(btn);
       });
     }
+
     function nextQuestion() {
       if (submitted) return;
+
       if (currentIndex < window.questions.length - 1) {
         currentIndex++;
         renderQuestion();
       }
     }
+
     function prevQuestion() {
       if (submitted) return;
+
       if (currentIndex > 0) {
         currentIndex--;
         renderQuestion();
       }
     }
+
     function clearResponse() {
       if (submitted) return;
+
       const q = window.questions[currentIndex];
+
       delete userAnswers[q.id];
+
       saveState();
       renderQuestion();
     }
+
     function markForReview() {
       if (submitted) return;
+
       const q = window.questions[currentIndex];
+
       if (markedQuestions[q.id] === true) {
         delete markedQuestions[q.id];
       } else {
         markedQuestions[q.id] = true;
       }
+
       saveState();
       renderQuestion();
     }
+
     function confirmSubmit() {
       if (submitted) return;
+
       const totalQuestions = window.questions.length;
       const answeredCount = window.questions.filter(isAnswered).length;
       const unansweredCount = totalQuestions - answeredCount;
       const markedCount = Object.values(markedQuestions).filter(Boolean).length;
+
       const ok = confirm(
         "Are you sure you want to submit the exam?\n\n" +
         "Total Questions: " + totalQuestions + "\n" +
@@ -660,12 +463,15 @@
         "Unanswered: " + unansweredCount + "\n" +
         "Marked for Review: " + markedCount
       );
+
       if (ok) {
         submitExam("manual", false);
       }
     }
+
     function sendSubmissionInBackground(submissionBody) {
       localStorage.setItem("neet_pending_submission", submissionBody);
+
       fetch(API_URL, {
         method: "POST",
         headers: {
@@ -680,6 +486,7 @@
         })
         .then(function(raw) {
           const serverResult = safeParse(raw);
+
           if (serverResult && (serverResult.ok === true || serverResult.status === "success")) {
             localStorage.setItem("neet_result", JSON.stringify(serverResult));
             localStorage.removeItem("neet_pending_submission");
@@ -689,18 +496,24 @@
           console.error("Background submission failed:", error);
         });
     }
+
     function submitExam(reason, isAuto) {
       if (submitted) return;
+
       submitted = true;
       clearInterval(timerInterval);
       setExamButtonsDisabled(true);
+
       const endedAt = new Date();
       const timeTakenSec = Math.floor((endedAt - startedAt) / 1000);
+
       const qOrder = window.questions.map(function(q) {
         return q.id;
       });
+
       const answerKey = buildAnswerKeyFromQuestions();
       const localResult = calculateLocalResult();
+
       const payload = {
         name: candidateName,
         phone: candidatePhone,
@@ -717,6 +530,7 @@
         startedAt: formatLocalDate(startedAt),
         endedAt: formatLocalDate(endedAt)
       };
+
       const localResultForStorage = {
         ok: true,
         status: "success",
@@ -740,15 +554,19 @@
         startedAtIST: formatLocalDate(startedAt),
         endedAtIST: formatLocalDate(endedAt)
       };
+
       const submissionBody = JSON.stringify({
         action: "submit",
         candidateId: candidateId,
         token: token,
+
         payload: payload,
+
         responses: userAnswers,
         markedQuestions: markedQuestions,
         qOrder: qOrder,
         answerKey: answerKey,
+
         timeTakenSec: timeTakenSec,
         violationCount: violationCount,
         userAgent: navigator.userAgent,
@@ -757,10 +575,13 @@
         startedAtIST: formatLocalDate(startedAt),
         endedAtIST: formatLocalDate(endedAt)
       });
+
       localStorage.setItem("neet_submitted", "yes");
       localStorage.setItem("neet_result", JSON.stringify(localResultForStorage));
       localStorage.removeItem(stateKey);
+
       sendSubmissionInBackground(submissionBody);
+
       alert(
         "Exam submitted successfully!\n\n" +
         "Score: " + localResult.score + "\n" +
@@ -770,32 +591,45 @@
         "Total Questions: " + localResult.totalQuestions + "\n" +
         "Violations: " + localResult.violations
       );
+
       window.location.replace("result.html");
     }
+
     function startTimer() {
       clearInterval(timerInterval);
+
       function updateTimer() {
         if (submitted) return;
+
         const now = new Date();
         const elapsed = Math.floor((now - startedAt) / 1000);
         const remaining = Math.max(EXAM_DURATION_SECONDS - elapsed, 0);
+
         const min = Math.floor(remaining / 60);
         const sec = remaining % 60;
+
         document.getElementById("timeLeft").textContent =
           min + ":" + String(sec).padStart(2, "0");
+
         if (remaining <= 0) {
           clearInterval(timerInterval);
           submitExam("time_over", true);
         }
       }
+
       updateTimer();
       timerInterval = setInterval(updateTimer, 1000);
     }
+
     function sendViolation(type, details) {
       if (!candidateId || !token || submitted) return;
+
       violationCount++;
+
       document.getElementById("vio").textContent = violationCount;
+
       saveState();
+
       fetch(API_URL, {
         method: "POST",
         headers: {
@@ -812,52 +646,64 @@
         keepalive: true
       }).catch(function() {});
     }
+
     document.addEventListener("visibilitychange", function() {
       if (document.hidden) {
         sendViolation("Tab switched", "Student switched tab or minimized browser");
       }
     });
+
     document.addEventListener("fullscreenchange", function() {
       if (!document.fullscreenElement) {
         sendViolation("Fullscreen exited", "Student exited fullscreen mode");
       }
     });
+
     document.addEventListener("contextmenu", function(e) {
       e.preventDefault();
       sendViolation("Right click attempted", "Student attempted right click");
     });
+
     document.addEventListener("copy", function(e) {
       e.preventDefault();
       sendViolation("Copy attempted", "Student attempted copy");
     });
+
     function formatLocalDate(date) {
       return date.toLocaleString("en-IN", {
         timeZone: "Asia/Kolkata",
         hour12: false
       });
     }
+
     const qImg = document.getElementById("qImg");
     const imgModal = document.getElementById("imgModal");
     const imgModalPic = document.getElementById("imgModalPic");
+
     qImg.onclick = function() {
       if (!qImg.src) return;
+
       imgModalPic.src = qImg.src;
       imgModal.classList.add("show");
     };
+
     function closeImageModal() {
       imgModal.classList.remove("show");
       imgModalPic.removeAttribute("src");
     }
+
     function openImageFullscreen() {
       if (imgModal.requestFullscreen) {
         imgModal.requestFullscreen();
       }
     }
+
     imgModal.onclick = function(e) {
       if (e.target === imgModal) {
         closeImageModal();
       }
     };
+
     applyStableQuestionOrder();
     loadState();
     renderQuestion();
