@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>NEET PG CBT - Exam</title>
 
   <style>
@@ -20,7 +21,7 @@
     .topbar {
       background: #003b66;
       color: white;
-      height: 34px;
+      min-height: 34px;
       padding: 7px 14px;
       display: flex;
       justify-content: space-between;
@@ -70,6 +71,19 @@
       white-space: pre-wrap;
     }
 
+    .media-status {
+      display: none;
+      padding: 12px;
+      margin: 12px 0;
+      background: #eef3f9;
+      border: 1px solid #d6dce5;
+      border-radius: 6px;
+      color: #003b66;
+      font-size: 14px;
+      font-weight: bold;
+      text-align: center;
+    }
+
     .qimg {
       width: 100%;
       max-height: 520px;
@@ -79,6 +93,17 @@
       border: 1px solid #ddd;
       border-radius: 4px;
       cursor: zoom-in;
+      background: #ffffff;
+    }
+
+    .qvideo {
+      width: 100%;
+      max-height: 520px;
+      display: block;
+      margin: 12px auto;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background: #000000;
     }
 
     .opts {
@@ -317,7 +342,8 @@
         font-size: 14px;
       }
 
-      .qimg {
+      .qimg,
+      .qvideo {
         max-height: 360px;
       }
 
@@ -380,7 +406,24 @@
         <div id="qTitle" class="qtitle"></div>
         <div id="qText" class="qtext"></div>
 
-        <img id="qImg" class="qimg" style="display:none;" alt="Question image" />
+        <div id="mediaStatus" class="media-status">Loading...</div>
+
+        <img
+          id="qImg"
+          class="qimg"
+          style="display:none;"
+          alt="Question image"
+          decoding="async"
+        />
+
+        <video
+          id="qVideo"
+          class="qvideo"
+          controls
+          playsinline
+          preload="metadata"
+          style="display:none;"
+        ></video>
 
         <div id="opts" class="opts"></div>
 
@@ -423,10 +466,12 @@
     </div>
   </div>
 
-  <script src="config.js?v=20260707b"></script>
-  <script src="questions.js?v=20260707b"></script>
+  <script src="config.js?v=20260710a"></script>
+  <script src="questions.js?v=20260710a"></script>
 
   <script>
+    const ASSET_VERSION = "20260710a";
+
     const API_URL = window.API_URL || window.SCRIPT_URL || "";
 
     const EXAM_DURATION_SECONDS = Number(
@@ -444,6 +489,7 @@
     let submitted = false;
     let violationCount = 0;
     let timerInterval = null;
+    let mediaLoadToken = 0;
 
     function safeParse(value) {
       try {
@@ -460,6 +506,33 @@
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
+    }
+
+    function versionedUrl(url) {
+      const cleanUrl = String(url || "").trim();
+      if (!cleanUrl) return "";
+
+      if (
+        cleanUrl.startsWith("http://") ||
+        cleanUrl.startsWith("https://") ||
+        cleanUrl.startsWith("data:")
+      ) {
+        return cleanUrl;
+      }
+
+      return cleanUrl.includes("?")
+        ? cleanUrl + "&v=" + ASSET_VERSION
+        : cleanUrl + "?v=" + ASSET_VERSION;
+    }
+
+    function isVideoUrl(url) {
+      const cleanUrl = String(url || "").split("?")[0].toLowerCase();
+      return (
+        cleanUrl.endsWith(".mp4") ||
+        cleanUrl.endsWith(".webm") ||
+        cleanUrl.endsWith(".ogg") ||
+        cleanUrl.endsWith(".mov")
+      );
     }
 
     const candidate =
@@ -481,6 +554,12 @@
     if (localStorage.getItem("neet_submitted") === "yes") {
       window.location.replace("result.html");
       throw new Error("Already submitted");
+    }
+
+    if (typeof window.isWithinExamWindow === "function" && !window.isWithinExamWindow()) {
+      alert("Exam is not live now.");
+      window.location.replace("instructions.html?v=20260710a");
+      throw new Error("Exam not live");
     }
 
     if (!API_URL) {
@@ -579,7 +658,6 @@
 
       if (saved.startedAt) {
         const savedStartedAt = new Date(saved.startedAt);
-
         if (!isNaN(savedStartedAt.getTime())) {
           startedAt = savedStartedAt;
         }
@@ -649,6 +727,124 @@
       });
     }
 
+    function getQuestionVideo(q) {
+      if (q.video && String(q.video).trim() !== "") return q.video;
+      if (q.image && isVideoUrl(q.image)) return q.image;
+      return "";
+    }
+
+    function getQuestionImage(q) {
+      if (q.image && String(q.image).trim() !== "" && !isVideoUrl(q.image)) {
+        return q.image;
+      }
+      return "";
+    }
+
+    function clearMedia() {
+      const img = document.getElementById("qImg");
+      const video = document.getElementById("qVideo");
+      const mediaStatus = document.getElementById("mediaStatus");
+
+      mediaLoadToken++;
+
+      img.onload = null;
+      img.onerror = null;
+      img.style.display = "none";
+      img.removeAttribute("src");
+
+      video.pause();
+      video.removeAttribute("src");
+      video.load();
+      video.style.display = "none";
+
+      mediaStatus.style.display = "none";
+      mediaStatus.textContent = "";
+    }
+
+    function loadQuestionMedia(q) {
+      clearMedia();
+
+      const img = document.getElementById("qImg");
+      const video = document.getElementById("qVideo");
+      const mediaStatus = document.getElementById("mediaStatus");
+
+      const videoUrl = getQuestionVideo(q);
+      const imageUrl = getQuestionImage(q);
+
+      mediaLoadToken++;
+      const thisToken = mediaLoadToken;
+
+      if (videoUrl) {
+        mediaStatus.textContent = "Loading video...";
+        mediaStatus.style.display = "block";
+
+        video.onloadedmetadata = function() {
+          if (thisToken !== mediaLoadToken) return;
+          mediaStatus.style.display = "none";
+          mediaStatus.textContent = "";
+          video.style.display = "block";
+        };
+
+        video.onerror = function() {
+          if (thisToken !== mediaLoadToken) return;
+          video.style.display = "none";
+          mediaStatus.textContent = "Video failed to load. Check file path, file type, and internet connection.";
+          mediaStatus.style.display = "block";
+        };
+
+        video.src = versionedUrl(videoUrl);
+        video.load();
+        return;
+      }
+
+      if (imageUrl) {
+        mediaStatus.textContent = "Loading image...";
+        mediaStatus.style.display = "block";
+
+        img.onload = function() {
+          if (thisToken !== mediaLoadToken) return;
+          mediaStatus.style.display = "none";
+          mediaStatus.textContent = "";
+          img.style.display = "block";
+          preloadNearbyMedia();
+        };
+
+        img.onerror = function() {
+          if (thisToken !== mediaLoadToken) return;
+          img.style.display = "none";
+          mediaStatus.textContent = "Image failed to load. Check image path and filename.";
+          mediaStatus.style.display = "block";
+        };
+
+        img.src = versionedUrl(imageUrl);
+      }
+    }
+
+    function preloadMediaForQuestion(q) {
+      const imageUrl = getQuestionImage(q);
+      const videoUrl = getQuestionVideo(q);
+
+      if (imageUrl) {
+        const preImg = new Image();
+        preImg.decoding = "async";
+        preImg.src = versionedUrl(imageUrl);
+      }
+
+      if (videoUrl) {
+        const preVideo = document.createElement("video");
+        preVideo.preload = "metadata";
+        preVideo.src = versionedUrl(videoUrl);
+      }
+    }
+
+    function preloadNearbyMedia() {
+      for (let i = currentIndex + 1; i <= currentIndex + 3; i++) {
+        if (i < window.questions.length) {
+          preloadMediaForQuestion(window.questions[i]);
+        }
+      }
+    }
+
     function renderQuestion() {
       const q = window.questions[currentIndex];
 
@@ -657,15 +853,7 @@
 
       document.getElementById("qText").textContent = q.question || "";
 
-      const img = document.getElementById("qImg");
-
-      if (q.image && String(q.image).trim() !== "") {
-        img.src = q.image;
-        img.style.display = "block";
-      } else {
-        img.style.display = "none";
-        img.removeAttribute("src");
-      }
+      loadQuestionMedia(q);
 
       const opts = document.getElementById("opts");
       opts.innerHTML = "";
@@ -691,7 +879,6 @@
           if (submitted) return;
 
           userAnswers[q.id] = index;
-
           delete markedQuestions[q.id];
 
           saveState();
@@ -705,6 +892,7 @@
 
       updateMarkButton();
       renderPalette();
+      preloadNearbyMedia();
       saveState();
     }
 
@@ -779,7 +967,6 @@
       if (submitted) return;
 
       const q = window.questions[currentIndex];
-
       delete userAnswers[q.id];
 
       saveState();
@@ -978,7 +1165,6 @@
       if (!candidateId || !token || submitted) return;
 
       violationCount++;
-
       document.getElementById("vio").textContent = violationCount;
 
       saveState();
