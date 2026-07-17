@@ -796,15 +796,15 @@ window.questions = [
 {
   id: 62,
   image: "",
-  question: "A 24-year-old man presents with persistent, distressing intrusive thoughts of contamination and spends hours repeatedly washing his hands. If a neuroimaging study were performed on this patient to investigate the underlying etiology, which of the following structural abnormalities is most likely to be found?",
+  question: "A 28-year-old patient with schizophrenia tells the psychiatrist, \"I don't even need to open my mouth. People around me can already hear what I am thinking because my thoughts are radiating out of my head.\" Which of the following specific thought phenomena is the patient experiencing?",
   options: [
-    "Enlarged lateral ventricles",
-    "Bilateral caudate atrophy",
-    "Hippocampal volume loss",
-    "Globus pallidus calcification"
+    "Thought insertion",
+    "Thought withdrawal",
+    "Thought broadcasting",
+    "Thought echo"
   ],
-  answerIndex: 1,
-  correctAnswerText: "Bilateral caudate atrophy"
+  answerIndex: 2,
+  correctAnswerText: "Thought broadcasting"
 },
   {
     id: 63,
